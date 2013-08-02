@@ -16,7 +16,7 @@ function mobile_template_get_header(){
 function mobile_template_get_footer(){
     global $gMobileTemplate;
     locate_template('/'.$gMobileTemplate['device'].'/footer.php', true);   
-    
+
     do_action('mobile-template-after-footer',$gMobileTemplate);
 }    
 

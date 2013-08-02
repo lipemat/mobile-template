@@ -12,8 +12,10 @@ class MobileTemplate {
            global $gMobileTemplate;
             $this->mobile = new MobileTemplateMobileDetect;   
             
+
             if( $this->is_phone() ){
                 $gMobileTemplate['device'] = 'phone';  
+
             }   
             
             if( $this->is_tablet() ){
@@ -91,15 +93,17 @@ class MobileTemplate {
         * @since 8.2.13
         */
        function getMobileTemplate( $template ){
-           global $post;
-           
+           global $post, $gMobileTemplate;
+
            if( isset( $_COOKIE['desktop-version'] ) ){
                return $template;
            }
            
+           $theme = get_stylesheet_directory();
+           
            do_action('mobile-template-get-template', $template );
            
-           $mobile_template = str_replace(MOBILE_TEMPLATE_THEME, MOBILE_TEMPLATE_THEME.'/'.$gMobileTemplate['device'].'/', $template );
+           $mobile_template = str_replace($theme, $theme.'/'.$gMobileTemplate['device'].'/', $template );
            
            //For templates matching the names of pages or posts
            if( is_page() || is_single() ){

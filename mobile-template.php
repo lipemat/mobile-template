@@ -8,7 +8,6 @@ Version: 1.0
 Author URI: http://lipeimagination.info/author/mat
 */
 
-define('MOBILE_TEMPLATE_THEME', 'mintpress' );
 
 require('functions.php');
 require('lib/MobileTemplateMobileDetect.php');
