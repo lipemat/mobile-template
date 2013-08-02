@@ -24,7 +24,7 @@ class MobileTemplate {
             if( $this->is_tablet() ){
                 $gMobileTemplate['device'] = 'tablet';
             }
-            
+
             if( $this->is_mobile() ){
                 $this->handleSwitchToDesktopLink();
                 add_filter('template_include', array( $this, 'getMobileTemplate' ) );
@@ -99,8 +99,11 @@ class MobileTemplate {
            do_action('mobile-template-get-template', $template );
            
            $mobile_template = str_replace($theme, $theme.'/'.$gMobileTemplate['device'], $template );
-           $mobile_template = str_replace($parent_theme, $theme.'/'.$gMobileTemplate['device'], $mobile_template );
            
+           if( $theme != $parent_theme ){
+                $mobile_template = str_replace($parent_theme, $theme.'/'.$gMobileTemplate['device'], $mobile_template );
+           }
+
            //For templates matching the names of pages or posts
            if( is_page() || is_single() ){
                 $named_template = substr($mobile_template, 0, -4).'-'.$post->post_name.'.php';
