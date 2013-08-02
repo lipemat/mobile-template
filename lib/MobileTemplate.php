@@ -7,11 +7,14 @@
          * @since 8.2.13
          */
 class MobileTemplate {
-        
+       
+    
+       /**
+        * @since 8.2.13
+        */
        function __construct(){
            global $gMobileTemplate;
             $this->mobile = new MobileTemplateMobileDetect;   
-            
 
             if( $this->is_phone() ){
                 $gMobileTemplate['device'] = 'phone';  
@@ -25,7 +28,6 @@ class MobileTemplate {
             if( $this->is_mobile() ){
                 $this->handleSwitchToDesktopLink();
                 add_filter('template_include', array( $this, 'getMobileTemplate' ) );
-                add_action('mobile-template-after-footer', array( $this, 'switchToDesktopLink' ) ); 
             }
               
        }
@@ -42,11 +44,11 @@ class MobileTemplate {
            if( !isset( $_GET['desktop-version'] ) ) return;
            
            if( $_GET['desktop-version'] == 'on' ){
-               
+                $_COOKIE['desktop-version'] = 1;
                 setcookie('desktop-version', 1, time()+86000); 
                  
            } elseif( $_GET['desktop-version'] == 'off' ){
-               
+                unset( $_COOKIE['desktop-version'] );
                 setcookie('desktop-version','', time()-86000);  
                  
            }
@@ -64,20 +66,15 @@ class MobileTemplate {
         */
        function switchToDesktopLink(){
            
-           //to test if cookie work on this browser
-           setcookie('test-cookie',1,time()+3600);
-           if( !isset( $_COOKIE['test-cookie'] ) ) return;
-           setcookie('test-cookie','',time()-3600);
-           
-           ?><div id="switch-to-desktop-link"><?php
+           ?><div id="switch-to-desktop-link" style="text-align: center; padding: 5px 0;"><?php
                 if( isset( $_COOKIE['desktop-version'] ) ){                   
                     $link = apply_filters('mobile-template-phone-link-text', 'switch to mobile site');
-                    printf('<a href="?desktop-version=off" title="switch to mobile site" />', $link );  
+                    printf('<a href="?desktop-version=off" title="switch to mobile site" />%s</a>', $link );  
                       
                 } else {
 
                     $link = apply_filters('mobile-template-desktop-link-text', 'switch to full site');
-                    printf('<a href="?desktop-version=on"/>', $link ); 
+                    printf('<a href="?desktop-version=on">%s</a>', $link ); 
                     
                 }
            ?></div><?php
@@ -94,28 +91,40 @@ class MobileTemplate {
         */
        function getMobileTemplate( $template ){
            global $post, $gMobileTemplate;
+           $new_template = false;
 
-           if( isset( $_COOKIE['desktop-version'] ) ){
-               return $template;
-           }
-           
            $theme = get_stylesheet_directory();
-           
+           $parent_theme = get_template_directory();
+
            do_action('mobile-template-get-template', $template );
            
-           $mobile_template = str_replace($theme, $theme.'/'.$gMobileTemplate['device'].'/', $template );
+           $mobile_template = str_replace($theme, $theme.'/'.$gMobileTemplate['device'], $template );
+           $mobile_template = str_replace($parent_theme, $theme.'/'.$gMobileTemplate['device'], $mobile_template );
            
            //For templates matching the names of pages or posts
            if( is_page() || is_single() ){
                 $named_template = substr($mobile_template, 0, -4).'-'.$post->post_name.'.php';
                 if( file_exists($named_template) ){
-                    return $named_template;   
+                    $new_template = $named_template;   
                 }
            }
 
-           if( file_exists($mobile_template) ){
-               return $mobile_template;   
+           if( !$new_template ){
+               if( file_exists($mobile_template) ){ 
+                    $new_template = $mobile_template;   
+               }
            }
+           
+           if( $new_template ){
+               if( isset( $_COOKIE['desktop-version'] ) ){                 
+                  add_action('wp_footer', array( $this, 'switchToDesktopLink' ) );
+                  return $template;
+               } else {
+                  add_action('mobile-template-after-footer', array( $this, 'switchToDesktopLink' ) ); 
+                  return $new_template;
+               }
+           }
+
            return $template;
        }
        
