@@ -28,10 +28,29 @@ class MobileTemplate {
            }
            
            
+           
+           add_action('after_setup_theme', array( $this, 'includeMobileFunctions' ) );
+           
+           
            add_action('admin_menu', array( $this, 'addSettingsPage' ) );
            add_action('admin_init', array( $this, 'setupSettings') );
            add_action('wp', array( $this, 'initMobileTheme' ) );
    
+       }
+       
+       /**
+        * Adds ablity to include some default functions when the plugin is active
+        * 
+        * @since 8.23.13
+        * 
+        * @uses added to the theme_loaded hook by self::__construct()
+        * 
+        * @uses create a file in the root of theme titled 'mobile-template-functions.php' and it will load on each page load
+        */
+       function includeMobileFunctions(){
+           if( file_exists($this->theme_dir.'/mobile-template-functions.php') ){
+               include($this->theme_dir.'/mobile-template-functions.php');
+           }
        }
        
 
