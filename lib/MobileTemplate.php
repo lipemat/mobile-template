@@ -36,8 +36,53 @@ class MobileTemplate {
                 $this->handleSwitchToDesktopLink();
                 add_filter('template_include', array( $this, 'replaceMobileTemplate' ) );
             }
+            
+            add_action('admin_menu', array( $this, 'addSettingsPage' ) );
               
        }
+       
+       
+       
+       /**
+        * Adds the Mobile Options Settings Page
+        * 
+        * @filters include
+        * apply_filters('mobile-template-menu-args', $args, $gMobileTemplate, $this )
+        * 
+        * @uses added to the admin_menu hook by self::__construct()
+        */
+       function addSettingsPage(){
+            global $gMobileTemplate;
+
+            $args = array(
+                        'title'           => 'Mobile Options',
+                        'capability'      => 'manage_options',
+                        'slug'            => 'mobile-options',
+                        'parent'          => 'options-general.php',
+                        'output_function' => array( $this, 'settingsPage' )
+                        );
+                        
+            $args = apply_filters('mobile-template-menu-args', $args, $gMobileTemplate, $this );
+                        
+            add_submenu_page($args['parent'], $args['title'], $args['title'], $args['capability'], $args['slug'], $args['output_function'] );
+
+       }
+       
+       
+       /**
+        * The output of the settings Page
+        * 
+        * @since 8.23.13
+        * 
+        * @uses create with add_submenu_page by self::addSettingsPage()
+        */
+       function settingsPage(){
+          ?><div class="wrap">
+            <?php screen_icon(); ?>
+                <h2>Mobile Options</h2>
+          <?php
+       }
+       
        
        
        /**
