@@ -4,18 +4,21 @@
          * Main Class for the Mobile Template Plugin
          * 
          * @author Mat Lipe
-         * @since 8.2.13
+         * @since 8.23.13
          */
 class MobileTemplate {
-       
+       private $theme_dir;
+       private $parent_theme_dir;
     
        /**
-        * @since 8.2.13
+        * @since 8.23.13
         */
        function __construct(){
            global $gMobileTemplate;
-            $this->mobile = new MobileTemplateMobileDetect;   
-
+           $this->mobile = new MobileTemplateMobileDetect;   
+           $this->theme_dir = get_stylesheet_directory();
+           $this->parent_theme_dir = get_template_directory();
+           
             if( $this->is_phone() ){
                 $gMobileTemplate['device'] = 'phone';  
 
@@ -26,11 +29,61 @@ class MobileTemplate {
             }
 
             if( $this->is_mobile() ){
+                if( file_exists($this->getMobileTemplate('functions.php')) ){
+                    require($this->getMobileTemplate('functions.php') );
+                }
+           
                 $this->handleSwitchToDesktopLink();
-                add_filter('template_include', array( $this, 'getMobileTemplate' ) );
+                add_filter('template_include', array( $this, 'replaceMobileTemplate' ) );
             }
               
        }
+       
+       
+       /**
+        * Gets the matching Mobile Template if it exists in the device named folder in the theme
+        * 
+        * @since 8.23.13
+        * @param string $template - $template name
+        * 
+        * @return bool|string - the retrieved template or false if not exists
+        */
+       function getMobileTemplate($template){
+           global $post, $gMobileTemplate;
+           $new_template = false;
+
+           do_action('mobile-template-get-template', $template );
+           
+           //if lookup is for a file without a path
+           if( sizeof(explode('/',$template)) == 1 ){
+               $mobile_template = $this->theme_dir.'/'.$gMobileTemplate['device'].'/'.$template;
+           } else {
+               //If the lookup has a path attahced check if child theme or parent theme
+                $mobile_template = str_replace($this->theme_dir, $this->theme_dir.'/'.$gMobileTemplate['device'], $template );
+                if( $this->theme_dir != $this->parent_theme_dir ){
+                    $mobile_template = str_replace($this->parent_theme_dir, $this->theme_dir.'/'.$gMobileTemplate['device'], $mobile_template );
+                }
+           }
+
+           //For templates matching the names of pages or posts
+           if( is_page() || is_single() ){
+                $named_template = substr($mobile_template, 0, -4).'-'.$post->post_name.'.php';
+                if( file_exists($named_template) ){
+                    $new_template = $named_template;   
+                }
+           }
+
+           if( !$new_template ){
+               if( file_exists($mobile_template) ){ 
+                    $new_template = $mobile_template;   
+               }
+           }
+           
+           return $new_template;
+           
+       }
+       
+       
        
        
        /**
@@ -60,7 +113,7 @@ class MobileTemplate {
        /**
         * Output a link to either switch to desktop or phone version
         * 
-        * @since 8.2.13
+        * @since 8.23.13
         * 
         * @uses added to the 'mobile-template-after-footer' hook by self::__construct()
         */
@@ -83,40 +136,17 @@ class MobileTemplate {
        
        
        
+       
+       
        /**
         * Created the file link to the phone version of the template file if exists
         * 
         * @uses called by construct on the 'template_include' filter
-        * @since 8.2.13
+        * @since 8.23.13
         */
-       function getMobileTemplate( $template ){
-           global $post, $gMobileTemplate;
-           $new_template = false;
-
-           $theme = get_stylesheet_directory();
-           $parent_theme = get_template_directory();
-
-           do_action('mobile-template-get-template', $template );
-           
-           $mobile_template = str_replace($theme, $theme.'/'.$gMobileTemplate['device'], $template );
-           
-           if( $theme != $parent_theme ){
-                $mobile_template = str_replace($parent_theme, $theme.'/'.$gMobileTemplate['device'], $mobile_template );
-           }
-
-           //For templates matching the names of pages or posts
-           if( is_page() || is_single() ){
-                $named_template = substr($mobile_template, 0, -4).'-'.$post->post_name.'.php';
-                if( file_exists($named_template) ){
-                    $new_template = $named_template;   
-                }
-           }
-
-           if( !$new_template ){
-               if( file_exists($mobile_template) ){ 
-                    $new_template = $mobile_template;   
-               }
-           }
+       function replaceMobileTemplate( $template ){
+               
+           $new_template = $this->getMobileTemplate($template);
            
            if( $new_template ){
                if( isset( $_COOKIE['desktop-version'] ) ){                 
