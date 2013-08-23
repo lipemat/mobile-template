@@ -38,13 +38,29 @@ class MobileTemplate {
             }
             
             add_action('admin_menu', array( $this, 'addSettingsPage' ) );
+            add_action('admin_init', array( $this, 'setupSettings') );
               
+       }
+
+
+       /**
+        * Adds the settings the mobile-template option 
+        * 
+        * @since 8.23.13
+        * 
+        * @uses added to the admin_init hook by self::__construct()
+        */
+       function setupSettings(){
+           register_setting( 'mobile-template', 'test_mode' );
+           register_setting( 'mobile-template', 'capability' );
        }
        
        
        
        /**
         * Adds the Mobile Options Settings Page
+        * 
+        * @since 8.23.13
         * 
         * @filters include
         * apply_filters('mobile-template-menu-args', $args, $gMobileTemplate, $this )
@@ -80,7 +96,29 @@ class MobileTemplate {
           ?><div class="wrap">
             <?php screen_icon(); ?>
                 <h2>Mobile Options</h2>
-          <?php
+                <form method="post" action="options.php">
+                    <?php settings_fields( 'mobile-template' ); ?>
+                    <?php do_settings_sections( 'mobile-template' ); ?>
+                    
+                    <h3>Test Mode:</h3>
+                    <p class="description">This mode will allow only logged in users to see the mobile theme.</p>
+                    <select name="test_mode">
+                        <option value="off" <?php selected('off', get_option('test_mode')); ?>>off</option>
+                        <option value="on" <?php selected('on', get_option('test_mode')); ?>>on</option>
+                    </select>
+                    
+                    <h3>Minimum User Role For Test Mode:</h3>
+                    <p class="description">With test mode enabled this is the mimimum user role who will see the mobile theme.</p>
+                    <select name="capability">
+                        <option value="read" <?php selected('red', get_option('capability')); ?>>Any Logged In User</option>
+                        <option value="edit_posts" <?php selected('edit_posts', get_option('capability')); ?>>Editor</option>
+                        <option value="manage_options" <?php selected('manage_options', get_option('capability')); ?>>Administrator</option>
+                    </select>
+                    <?php submit_button(); ?>
+
+                </form>
+            </div>     
+            <?php
        }
        
        
