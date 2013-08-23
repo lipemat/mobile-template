@@ -15,20 +15,38 @@ class MobileTemplate {
         */
        function __construct(){
            global $gMobileTemplate;
+           
            $this->mobile = new MobileTemplateMobileDetect;   
            $this->theme_dir = get_stylesheet_directory();
            $this->parent_theme_dir = get_template_directory();
-           
-            if( $this->is_phone() ){
+           if( $this->is_phone() ){
                 $gMobileTemplate['device'] = 'phone';  
-
-            }   
+           }   
             
-            if( $this->is_tablet() ){
+           if( $this->is_tablet() ){
                 $gMobileTemplate['device'] = 'tablet';
-            }
+           }
+           
+           
+           add_action('admin_menu', array( $this, 'addSettingsPage' ) );
+           add_action('admin_init', array( $this, 'setupSettings') );
+           add_action('wp', array( $this, 'initMobileTheme' ) );
+   
+       }
+       
 
-            if( $this->is_mobile() ){
+        /**
+         * Puts the mobile Theme functionality in motion
+         * 
+         * @since 8.23.13
+         * @uses added to the wp hook by self::__construct()
+         */
+        function initMobileTheme(){
+           //if test mode is on 
+           if( $this->checkForTestMode() ){
+               return;
+           }
+           if( $this->is_mobile() ){
                 if( file_exists($this->getMobileTemplate('functions.php')) ){
                     require($this->getMobileTemplate('functions.php') );
                 }
@@ -36,10 +54,31 @@ class MobileTemplate {
                 $this->handleSwitchToDesktopLink();
                 add_filter('template_include', array( $this, 'replaceMobileTemplate' ) );
             }
-            
-            add_action('admin_menu', array( $this, 'addSettingsPage' ) );
-            add_action('admin_init', array( $this, 'setupSettings') );
-              
+        }
+        
+        
+
+
+       /**
+        * Checks if test mode is on
+        * Then verfies of a user is logged in and has rights to see the mobile version
+        * 
+        * @since 8.23.13
+        * 
+        * @uses called by self::__construct()
+        * 
+        * @return bool - true if should not display the mobile theme
+        */
+       function checkForTestMode(){
+          if( get_option('mobile_template_test_mode') != 'on' ){
+              return false;
+          }
+          
+          if( current_user_can(get_option('mobile_template_capability')) ){
+              return false;    
+          }
+           
+          return true;
        }
 
 
@@ -51,8 +90,8 @@ class MobileTemplate {
         * @uses added to the admin_init hook by self::__construct()
         */
        function setupSettings(){
-           register_setting( 'mobile-template', 'test_mode' );
-           register_setting( 'mobile-template', 'capability' );
+           register_setting( 'mobile-template', 'mobile_template_test_mode' );
+           register_setting( 'mobile-template', 'mobile_template_capability' );
        }
        
        
@@ -100,19 +139,24 @@ class MobileTemplate {
                     <?php settings_fields( 'mobile-template' ); ?>
                     <?php do_settings_sections( 'mobile-template' ); ?>
                     
+                    
+                    <?php $test_mode = get_option('mobile_template_test_mode'); ?>
+                    
                     <h3>Test Mode:</h3>
                     <p class="description">This mode will allow only logged in users to see the mobile theme.</p>
-                    <select name="test_mode">
-                        <option value="off" <?php selected('off', get_option('test_mode')); ?>>off</option>
-                        <option value="on" <?php selected('on', get_option('test_mode')); ?>>on</option>
+                    <select name="mobile_template_test_mode">
+                        <option value="off" <?php selected('off', $test_mode); ?>>off</option>
+                        <option value="on" <?php selected('on', $test_mode); ?>>on</option>
                     </select>
+                    
+                    <?php $capability = get_option('mobile_template_capability'); ?>
                     
                     <h3>Minimum User Role For Test Mode:</h3>
                     <p class="description">With test mode enabled this is the mimimum user role who will see the mobile theme.</p>
-                    <select name="capability">
-                        <option value="read" <?php selected('red', get_option('capability')); ?>>Any Logged In User</option>
-                        <option value="edit_posts" <?php selected('edit_posts', get_option('capability')); ?>>Editor</option>
-                        <option value="manage_options" <?php selected('manage_options', get_option('capability')); ?>>Administrator</option>
+                    <select name="mobile_template_capability">
+                        <option value="read" <?php selected('red', $capability); ?>>Any Logged In User</option>
+                        <option value="edit_posts" <?php selected('edit_posts', $capability); ?>>Editor</option>
+                        <option value="manage_options" <?php selected('manage_options', $capability); ?>>Administrator</option>
                     </select>
                     <?php submit_button(); ?>
 
