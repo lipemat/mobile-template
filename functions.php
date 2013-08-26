@@ -4,7 +4,7 @@
              * Misc Functions used along with the mobile template plugin
              * 
              * @author Mat Lipe
-             * @since 8.23.13
+             * @since 8.26.13
              */
 
              
