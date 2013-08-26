@@ -4,12 +4,14 @@
          * Main Class for the Mobile Template Plugin
          * 
          * @author Mat Lipe
-         * @since 8.23.13
+         * @since 8.26.13
          */
 class MobileTemplate {
        private $theme_dir;
        private $parent_theme_dir;
-    
+       public $desktop_test_mode = false;
+       
+       
        /**
         * @since 8.23.13
         */
@@ -57,7 +59,7 @@ class MobileTemplate {
         /**
          * Puts the mobile Theme functionality in motion
          * 
-         * @since 8.23.13
+         * @since 8.26.13
          * @uses added to the wp hook by self::__construct()
          */
         function initMobileTheme(){
@@ -65,14 +67,15 @@ class MobileTemplate {
            if( $this->checkForTestMode() ){
                return;
            }
-           if( $this->is_mobile() ){
+           
+           if( $this->is_mobile() || $this->desktop_test_mode ){
                 if( file_exists($this->getMobileTemplate('functions.php')) ){
                     require($this->getMobileTemplate('functions.php') );
                 }
            
                 $this->handleSwitchToDesktopLink();
                 add_filter('template_include', array( $this, 'replaceMobileTemplate' ) );
-            }
+            } 
         }
         
         
@@ -84,17 +87,31 @@ class MobileTemplate {
         * 
         * @since 8.23.13
         * 
-        * @uses called by self::__construct()
+        * @uses called by self::initMobileTheme()
         * 
         * @return bool - true if should not display the mobile theme
         */
        function checkForTestMode(){
+          global $gMobileTemplate;
+        
           if( get_option('mobile_template_test_mode') != 'on' ){
               return false;
           }
-          
-          if( current_user_can(get_option('mobile_template_capability')) ){
-              return false;    
+
+          if( !current_user_can(get_option('mobile_template_capability')) ){
+              return true;    
+          }
+ 
+          if( !$this->is_mobile() ){
+              if( get_option('mobile_template_show_desktop') == 'on' ){
+                 $this->desktop_test_mode = true;
+                 $gMobileTemplate['device'] = get_option('mobile_template_show_device');
+                 return false;
+              } else {
+                 return true;
+              }
+          } else {
+              return false;
           }
            
           return true;
@@ -104,13 +121,15 @@ class MobileTemplate {
        /**
         * Adds the settings the mobile-template option 
         * 
-        * @since 8.23.13
+        * @since 8.26.13
         * 
         * @uses added to the admin_init hook by self::__construct()
         */
        function setupSettings(){
            register_setting( 'mobile-template', 'mobile_template_test_mode' );
            register_setting( 'mobile-template', 'mobile_template_capability' );
+           register_setting( 'mobile-template', 'mobile_template_show_desktop' );
+           register_setting( 'mobile-template', 'mobile_template_show_device' );
        }
        
        
@@ -118,7 +137,7 @@ class MobileTemplate {
        /**
         * Adds the Mobile Options Settings Page
         * 
-        * @since 8.23.13
+        * @since 8.26.13
         * 
         * @filters include
         * apply_filters('mobile-template-menu-args', $args, $gMobileTemplate, $this )
@@ -167,7 +186,25 @@ class MobileTemplate {
                         <option value="off" <?php selected('off', $test_mode); ?>>off</option>
                         <option value="on" <?php selected('on', $test_mode); ?>>on</option>
                     </select>
+                    <p>&nbsp;</p>
                     
+                    <?php $show_desktop = get_option('mobile_template_show_desktop'); ?>
+                    <?php $show_device = get_option('mobile_template_show_device'); ?>
+                   
+                    <h3>Show Mobile Theme On Desktops:</h3>
+                    <p class="description">This will display the mobile theme on desktops when logged in and test mode is on.</p>
+                    <select name="mobile_template_show_desktop">
+                        <option value="off" <?php selected('off', $show_desktop); ?>>off</option>
+                        <option value="on" <?php selected('on', $show_desktop); ?>>on</option>
+                    </select>
+                    <br>
+                    Device's Theme to Show:<select name="mobile_template_show_device">
+                        <option value="phone" <?php selected('phone', $show_device); ?>>phone</option>
+                        <option value="tablet" <?php selected('tablet', $show_device); ?>>tablet</option>
+                    </select>
+                     <p>&nbsp;</p>
+
+
                     <?php $capability = get_option('mobile_template_capability'); ?>
                     
                     <h3>Minimum User Role For Test Mode:</h3>
@@ -177,6 +214,8 @@ class MobileTemplate {
                         <option value="edit_posts" <?php selected('edit_posts', $capability); ?>>Editor</option>
                         <option value="manage_options" <?php selected('manage_options', $capability); ?>>Administrator</option>
                     </select>
+                     <p>&nbsp;</p>
+                     
                     <?php submit_button(); ?>
 
                 </form>
