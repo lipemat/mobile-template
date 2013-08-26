@@ -47,6 +47,19 @@ function mobile_template_get_footer(){
 
 
 /**
+* Output a link to either switch to desktop or phone version
+* 
+* @since 1.1.0
+*
+* @uses MobileTemplate::switchToDesktopLink()
+*/
+function mobile_template_switch_to_desktop_link(){
+   MobileTemplate::switchToDesktopLink();   
+}
+
+
+
+/**
  * Includes a template file from the mobile template
  * 
  * @param string $first - the type of template

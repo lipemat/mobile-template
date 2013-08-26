@@ -298,11 +298,11 @@ class MobileTemplate {
        /**
         * Output a link to either switch to desktop or phone version
         * 
-        * @since 8.23.13
+        * @since 8.26.13
         * 
         * @uses added to the 'mobile-template-after-footer' hook by self::__construct()
         */
-       function switchToDesktopLink(){
+       public function switchToDesktopLink(){
            
            ?><div id="switch-to-desktop-link" style="text-align: center; padding: 5px 0;"><?php
                 if( isset( $_COOKIE['desktop-version'] ) ){                   
@@ -318,11 +318,7 @@ class MobileTemplate {
            ?></div><?php
            
        }
-       
-       
-       
-       
-       
+        
        /**
         * Created the file link to the phone version of the template file if exists
         * 
