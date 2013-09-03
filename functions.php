@@ -4,7 +4,7 @@
              * Misc Functions used along with the mobile template plugin
              * 
              * @author Mat Lipe
-             * @since 8.26.13
+             * @since 9.3.13
              */
 
              
@@ -98,11 +98,14 @@ function mobile_template_get_sidebar($name = 'sidebar' ){
  * 
  * @uses add to your header.php for footer.php file
  * 
- * @since 8.23.13
+ * @since 9.3.13
  * 
  * @param string $file - the js file
  */
-function mobile_template_js_file($file){   
+function mobile_template_js_file($file){
+    if( strpos( $file, '.js') === false ){
+        $file = $file.'.js';
+    }   
     printf('<script type="text/javascript" src="%sjs/%s" ></script>', mobile_template_url(), $file );
 }
 

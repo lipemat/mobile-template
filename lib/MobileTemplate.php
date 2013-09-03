@@ -29,8 +29,6 @@ class MobileTemplate {
                 $gMobileTemplate['device'] = 'tablet';
            }
            
-           
-           
            add_action('after_setup_theme', array( $this, 'includeMobileFunctions' ) );
            
            
