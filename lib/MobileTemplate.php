@@ -118,7 +118,7 @@ class MobileTemplate {
         * Checks if test mode is on
         * Then verfies of a user is logged in and has rights to see the mobile version
         * 
-        * @since 8.23.13
+        * @since 9.11.13
         * 
         * @uses called by self::initMobileTheme()
         * 
@@ -139,6 +139,9 @@ class MobileTemplate {
               if( get_option('mobile_template_show_desktop') == 'on' ){
                  $this->desktop_test_mode = true;
                  $gMobileTemplate['device'] = get_option('mobile_template_show_device');
+                 if( !file_exists($this->theme_dir.'/'.$gMobileTemplate['device']) ){
+                    $gMobileTemplate['device'] = 'mobile';     
+                 }
                  return false;
               } else {
                  return true;
@@ -353,7 +356,7 @@ class MobileTemplate {
        }
         
        /**
-        * Created the file link to the phone version of the template file if exists
+        * Created the file link to the mobile version of the template file if exists
         * 
         * @uses called by construct on the 'template_include' filter
         * @since 8.23.13
