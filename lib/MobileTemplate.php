@@ -4,16 +4,17 @@
          * Main Class for the Mobile Template Plugin
          * 
          * @author Mat Lipe
-         * @since 8.26.13
+         * @since 9.11.13
          */
 class MobileTemplate {
        private $theme_dir;
        private $parent_theme_dir;
        public $desktop_test_mode = false;
+       private $mobile_folder_exists = false;
        
        
        /**
-        * @since 8.23.13
+        * @since 9.11.13
         */
        function __construct(){
            global $gMobileTemplate;
@@ -21,22 +22,56 @@ class MobileTemplate {
            $this->mobile = new MobileTemplateMobileDetect;   
            $this->theme_dir = get_stylesheet_directory();
            $this->parent_theme_dir = get_template_directory();
-           if( $this->is_phone() ){
-                $gMobileTemplate['device'] = 'phone';  
-           }   
-            
-           if( $this->is_tablet() ){
-                $gMobileTemplate['device'] = 'tablet';
-           }
            
-           add_action('after_setup_theme', array( $this, 'includeMobileFunctions' ) );
+           //Setup proper theme device folder
+           $this->setDeviceFolder();
            
            
+           add_action('after_setup_theme', array( $this, 'includeMobileFunctions' ) ); 
            add_action('admin_menu', array( $this, 'addSettingsPage' ) );
            add_action('admin_init', array( $this, 'setupSettings') );
            add_action('wp', array( $this, 'initMobileTheme' ) );
    
        }
+
+       
+       /**
+        * Setup proper theme's device folder
+        * 
+        * @uses check for a mobile, phone, or tablet folder - will use device before mobile if exists
+        * 
+        * @uses called by self::__construct()
+        * @since 1.2.0
+        * 
+        * 
+        */
+       function setDeviceFolder(){
+           global $gMobileTemplate;
+           //Check for a mobile folder
+           if( file_exists($this->theme_dir.'/mobile')){
+                $this->mobile_folder_exists = true;
+           }
+           
+           //If this device is a phone
+           if( $this->is_phone() ){
+                if( file_exists($this->theme_dir.'/phone')){
+                   $gMobileTemplate['device'] = 'phone';  
+                } elseif( $this->mobile_folder_exists) {
+                    $gMobileTemplate['device'] = 'mobile';  
+                }
+           }   
+            
+           //If this device is a tablet
+           if( $this->is_tablet() ){
+                if( file_exists($this->theme_dir.'/tablet')){
+                   $gMobileTemplate['device'] = 'tablet';  
+                } elseif( $this->mobile_folder_exists) {
+                    $gMobileTemplate['device'] = 'mobile';  
+                }
+           }
+       }
+
+
        
        /**
         * Adds ablity to include some default functions when the plugin is active
