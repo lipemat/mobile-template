@@ -5,9 +5,12 @@ A WordPress plugin for extremely simple and lightweight mobile theming.
 
 #Usage
 
-Once activated the plugin will do all the tough stuff for you. Simple create a folder titled either 'phone' or 'tablet'. If you would like a universal theme used for all mobile devices create a folder titled 'mobile'
-in you theme and add your WordPress named template files in this folder and they will automatically be served up to 
+Once activated the plugin will do all the tough stuff for you. Simple create a folder titled either 'phone' or 'tablet' in 
+your theme and add your WordPress named template files in this folder and they will automatically be served up to 
 viewers using that type of device. 
+
+If you would like a universal theme used for all mobile devices (both phones and tablets) create a folder titled 'mobile'
+
 
 For instance, if you want to use a custom template for your homepage for only viewers using a mobile phone, 
 you would create a folder named phone and add an home.php file inside of it.
