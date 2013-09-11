@@ -1,4 +1,4 @@
-mobile-template
+Mobile Template - WordPress plugin
 ===============
 
 A WordPress plugin for extremely simple and lightweight mobile theming. 
