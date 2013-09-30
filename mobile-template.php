@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Mobile Template
-Plugin URI: http://lipeimagination.info 
+Plugin URI: http://matlipe.com
 Description: Template Overrides for Mobile Devices
 Author: Mat Lipe
 Version: 1.2.0
-Author URI: http://lipeimagination.info/author/mat
+Author URI: http://matlipe.com
 */
 
 
