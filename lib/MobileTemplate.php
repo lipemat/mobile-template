@@ -264,14 +264,13 @@ class MobileTemplate {
        /**
         * Gets the matching Mobile Template if it exists in the device named folder in the theme
         * 
-        * @since 8.23.13
+        * @since 10.7.13
         * @param string $template - $template name
         * 
         * @return bool|string - the retrieved template or false if not exists
         */
        function getMobileTemplate($template){
            global $post, $gMobileTemplate;
-           $new_template = false;
 
            do_action('mobile-template-get-template', $template );
            
@@ -288,19 +287,24 @@ class MobileTemplate {
 
            //For templates matching the names of pages or posts
            if( is_page() || is_single() ){
-                $named_template = substr($mobile_template, 0, -4).'-'.$post->post_name.'.php';
+                $pre = substr($mobile_template, 0, -4);
+                $named_template = $pre.'-'.$post->post_name.'.php';
+                $id_template = $pre.'-'.$post->ID.'.php';
+                $type_template = $pre.'-'.$post->post_type.'.php';
                 if( file_exists($named_template) ){
-                    $new_template = $named_template;   
+                    return $named_template;   
+                } elseif( file_exists($id_template ) ){
+                    return $id_template;
+                } elseif( file_exists( $type_template ) ){
+                    return $type_template;   
                 }
            }
 
-           if( !$new_template ){
-               if( file_exists($mobile_template) ){ 
-                    $new_template = $mobile_template;   
-               }
+           if( file_exists($mobile_template) ){ 
+              return $mobile_template;   
            }
            
-           return $new_template;
+           return false;
            
        }
        
