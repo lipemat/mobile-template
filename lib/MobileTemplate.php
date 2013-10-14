@@ -4,25 +4,25 @@
          * Main Class for the Mobile Template Plugin
          * 
          * @author Mat Lipe
-         * @since 9.11.13
+         * @since 10.14.13
          */
 class MobileTemplate {
-       private $theme_dir;
-       private $parent_theme_dir;
+       public $theme_dir;
+       public $parent_theme_dir;
        public $desktop_test_mode = false;
-       private $mobile_folder_exists = false;
+       public $mobile_folder_exists = false;
        
        
        /**
-        * @since 9.11.13
+        * @since 10.14.13
         */
        function __construct(){
            global $gMobileTemplate;
            
            $this->mobile = new MobileTemplateMobileDetect;   
-           $this->theme_dir = get_stylesheet_directory();
-           $this->parent_theme_dir = get_template_directory();
-           
+           $gMobileTemplate['theme_dir'] = $this->theme_dir = get_stylesheet_directory();
+           $gMobileTemplate['parent_theme_dir'] = $this->parent_theme_dir = get_template_directory();
+
            //Setup proper theme device folder
            $this->setDeviceFolder();
            
@@ -47,6 +47,7 @@ class MobileTemplate {
         */
        function setDeviceFolder(){
            global $gMobileTemplate;
+           
            //Check for a mobile folder
            if( file_exists($this->theme_dir.'/mobile')){
                 $this->mobile_folder_exists = true;
@@ -69,6 +70,10 @@ class MobileTemplate {
                     $gMobileTemplate['device'] = 'mobile';  
                 }
            }
+           
+           
+           
+           
        }
 
 

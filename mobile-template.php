@@ -8,7 +8,7 @@ Version: 1.3.0
 Author URI: http://matlipe.com
 */
 
-/** USE $_GLOBALS['gMobileTemplate'] for current mobile theme directory **/
+/** USE $GLOBALS['gMobileTemplate']['device'] for current mobile theme directory **/
 
 
 
