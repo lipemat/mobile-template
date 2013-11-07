@@ -4,7 +4,7 @@
          * Main Class for the Mobile Template Plugin
          * 
          * @author Mat Lipe
-         * @since 10.14.13
+         * @since 11.7.13
          */
 class MobileTemplate {
        public $theme_dir;
@@ -25,6 +25,8 @@ class MobileTemplate {
 
            //Setup proper theme device folder
            $this->setDeviceFolder();
+           
+           //the comments template
            
            
            add_action('after_setup_theme', array( $this, 'includeMobileFunctions' ) ); 
@@ -97,7 +99,7 @@ class MobileTemplate {
         /**
          * Puts the mobile Theme functionality in motion
          * 
-         * @since 8.26.13
+         * @since 11.7.13
          * @uses added to the wp hook by self::__construct()
          */
         function initMobileTheme(){
@@ -107,9 +109,17 @@ class MobileTemplate {
            }
            
            if( $this->is_mobile() || $this->desktop_test_mode ){
+                    
+                //functions file    
                 if( file_exists($this->getMobileTemplate('functions.php')) ){
                     require($this->getMobileTemplate('functions.php') );
                 }
+                
+                //comments file
+                if( file_exists($this->getMobileTemplate('comments.php')) ){
+                    add_filter('comments_template', array( $this, 'commentsTemplate' ) );   
+                } 
+                
            
                 $this->handleSwitchToDesktopLink();
                 add_filter('template_include', array( $this, 'replaceMobileTemplate' ) );
@@ -117,7 +127,18 @@ class MobileTemplate {
         }
         
         
-
+        /**
+         * Returns location of the mobile theme's comments.php template
+         * 
+         * @uses added to the comments_template filter by self::initMobileTheme()
+         * 
+         * @since 11.7.13
+         */
+        function commentsTemplate(){
+            return $this->getMobileTemplate('comments.php');
+        }
+        
+        
 
        /**
         * Checks if test mode is on
