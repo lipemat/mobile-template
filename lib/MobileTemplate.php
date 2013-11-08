@@ -122,6 +122,7 @@ class MobileTemplate {
                 
            
                 $this->handleSwitchToDesktopLink();
+                
                 add_filter('template_include', array( $this, 'replaceMobileTemplate' ) );
             } 
         }
@@ -366,7 +367,7 @@ class MobileTemplate {
         * 
         * @since 8.26.13
         * 
-        * @uses added to the 'mobile-template-after-footer' hook by self::__construct()
+        * @uses added to the 'mobile-template-after-footer' hook by self::initMobileTheme()
         */
        public function switchToDesktopLink(){
            
