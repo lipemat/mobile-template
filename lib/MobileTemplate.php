@@ -343,7 +343,7 @@ class MobileTemplate {
         * 
         * @since 8.2.13
         * 
-        * @uses called during self::__construct if is_mobile() is true
+        * @uses called during self::initMobileTheme() if is_mobile() is true
         */
        function handleSwitchToDesktopLink(){
            if( !isset( $_GET['desktop-version'] ) ) return;
@@ -367,7 +367,7 @@ class MobileTemplate {
         * 
         * @since 8.26.13
         * 
-        * @uses added to the 'mobile-template-after-footer' hook by self::initMobileTheme()
+        * @uses added to the 'mobile-template-after-footer' hook by self::replaceMobileTemplate()
         */
        public function switchToDesktopLink(){
            
