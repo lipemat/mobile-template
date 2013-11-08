@@ -4,7 +4,7 @@
              * Misc Functions used along with the mobile template plugin
              * 
              * @author Mat Lipe
-             * @since 9.3.13
+             * @since 11.8.13
              */
 
              
@@ -15,13 +15,20 @@
  * mobile-template-before-header
  * mobile-template-after-header
  * 
+ * @since 11.8.13
  * 
  * @see get_footer()
  */          
-function mobile_template_get_header(){
+function mobile_template_get_header($name = null){
     global $gMobileTemplate;
+    
+    if ( isset($name) )
+        $templates[] = '/'.$gMobileTemplate['device']."/header-{$name}.php";
+
+    $templates[] = '/'.$gMobileTemplate['device'].'/header.php';
+    
     do_action('mobile-template-before-header',$gMobileTemplate);
-    locate_template('/'.$gMobileTemplate['device'].'/header.php', true);  
+    locate_template( $templates, true);  
     do_action('mobile-template-after-header',$gMobileTemplate); 
     
 }
@@ -34,13 +41,20 @@ function mobile_template_get_header(){
  * mobile-template-before-footer
  * mobile-template-after-footer
  * 
+ * @since 11.8.13
  * 
  * @see get_footer()
  */
-function mobile_template_get_footer(){
+function mobile_template_get_footer($name = null){
     global $gMobileTemplate;
+    
+    if ( isset($name) )
+        $templates[] = '/'.$gMobileTemplate['device']."/footer-{$name}.php";
+
+    $templates[] = '/'.$gMobileTemplate['device'].'/footer.php';
+    
     do_action('mobile-template-before-footer',$gMobileTemplate);
-    locate_template('/'.$gMobileTemplate['device'].'/footer.php', true);   
+    locate_template( $templates, true);     
     do_action('mobile-template-after-footer',$gMobileTemplate);
 }    
 
