@@ -4,7 +4,7 @@
          * Main Class for the Mobile Template Plugin
          * 
          * @author Mat Lipe
-         * @since 11.7.13
+         * @since 12.20.13
          */
 class MobileTemplate {
        public $theme_dir;
@@ -26,9 +26,6 @@ class MobileTemplate {
            //Setup proper theme device folder
            $this->setDeviceFolder();
            
-           //the comments template
-           
-           
            add_action('after_setup_theme', array( $this, 'includeMobileFunctions' ) ); 
            add_action('admin_menu', array( $this, 'addSettingsPage' ) );
            add_action('admin_init', array( $this, 'setupSettings') );
@@ -45,6 +42,8 @@ class MobileTemplate {
         * @uses called by self::__construct()
         * @since 1.2.0
         * 
+        * 
+        * @since 12.20.13
         * 
         */
        function setDeviceFolder(){
@@ -73,9 +72,11 @@ class MobileTemplate {
                 }
            }
            
-           
-           
-           
+           //A folder that does not exist if we have not available folder we don't want to find any files
+           if( empty( $gMobileTemplate['device'] ) ){
+               $gMobileTemplate['device'] = 'not-mobile-theme-present';
+           }
+
        }
 
 
@@ -154,11 +155,12 @@ class MobileTemplate {
        function checkForTestMode(){
           global $gMobileTemplate;
         
+          //test mode not on
           if( get_option('mobile_template_test_mode') != 'on' ){
               return false;
-          }
-
-          if( !current_user_can(get_option('mobile_template_capability')) ){
+              
+          //test mode is on - is user allowed?
+          } elseif( !current_user_can(get_option('mobile_template_capability')) ){
               return true;    
           }
  
@@ -393,9 +395,9 @@ class MobileTemplate {
         * @since 8.23.13
         */
        function replaceMobileTemplate( $template ){
-               
+
            $new_template = $this->getMobileTemplate($template);
-           
+
            if( $new_template ){
                if( isset( $_COOKIE['desktop-version'] ) ){                 
                   add_action('wp_footer', array( $this, 'switchToDesktopLink' ) );
