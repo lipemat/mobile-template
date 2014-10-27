@@ -25,13 +25,35 @@ class MobileTemplate {
 
            //Setup proper theme device folder
            $this->setDeviceFolder();
-           
-           add_action('after_setup_theme', array( $this, 'includeMobileFunctions' ) ); 
-           add_action('admin_menu', array( $this, 'addSettingsPage' ) );
-           add_action('admin_init', array( $this, 'setupSettings') );
-           add_action('wp', array( $this, 'initMobileTheme' ) );
+
+	       if( is_admin() ){
+		       add_action('admin_menu', array( $this, 'addSettingsPage' ) );
+		       add_action('admin_init', array( $this, 'setupSettings') );
+	       }
+
+	       add_action( 'after_setup_theme', array( $this, 'includeMobileFunctions' ) );
+
+	       add_action('wp', array( $this, 'initMobileTheme' ) );
    
        }
+
+
+	/**
+	 * is_showing_mobile_theme
+	 *
+	 * Against all checks, are we showing mobile theme right now?
+	 *
+	 * @return bool
+	 */
+		function is_showing_mobile_theme(){
+			if( $this->is_mobile() || $this->desktop_test_mode ){
+				if( empty( $_COOKIE[ 'desktop-version' ] ) ){
+					return true;
+				}
+			}
+
+			return false;
+		}
 
        
        /**
@@ -110,21 +132,20 @@ class MobileTemplate {
            }
            
            if( $this->is_mobile() || $this->desktop_test_mode ){
-                    
-                //functions file    
-                if( file_exists($this->getMobileTemplate('functions.php')) ){
-                    require($this->getMobileTemplate('functions.php') );
-                }
-                
-                //comments file
-                if( file_exists($this->getMobileTemplate('comments.php')) ){
-                    add_filter('comments_template', array( $this, 'commentsTemplate' ) );   
-                } 
-                
-           
-                $this->handleSwitchToDesktopLink();
-                
-                add_filter('template_include', array( $this, 'replaceMobileTemplate' ) );
+	           $this->handleSwitchToDesktopLink();
+	           add_filter( 'template_include', array( $this, 'replaceMobileTemplate' ) );
+
+	           if( $this->is_showing_mobile_theme() ){
+		           //functions file
+		           if( file_exists( $this->getMobileTemplate( 'functions.php' ) ) ){
+			           require( $this->getMobileTemplate( 'functions.php' ) );
+		           }
+
+		           //comments file
+		           if( file_exists( $this->getMobileTemplate( 'comments.php' ) ) ){
+			           add_filter( 'comments_template', array( $this, 'commentsTemplate' ) );
+		           }
+	           }
             } 
         }
         
