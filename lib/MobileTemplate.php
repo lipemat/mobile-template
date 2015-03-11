@@ -24,7 +24,7 @@ class MobileTemplate {
 	function __construct(){
 		global $gMobileTemplate;
 
-		$this->mobile                          = new MobileTemplateMobileDetect;
+		$this->mobile                          = new \Mobile_Template\Mobile_Detect;
 		$gMobileTemplate[ 'theme_dir' ]        = $this->theme_dir = get_stylesheet_directory();
 		$gMobileTemplate[ 'parent_theme_dir' ] = $this->parent_theme_dir = get_template_directory();
 
